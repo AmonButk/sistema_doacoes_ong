@@ -81,6 +81,53 @@ class Controller_Doacao:
 
         return ultima_doacao_inserida
 
+    def atualizar_doacao(self) -> Doacao:
+        '''
+        Altera todos os atributos de uma doação existente, exceto o ID (PK),
+        repetindo até o usuário responder "N". Após o UPDATE, o registro é
+        relido do banco para exibir exatamente o que foi persistido.
+        Retorna a última doação atualizada, ou None se nenhuma foi alterada.
+        '''
+        ultima_doacao_atualizada = None
+
+        while True:
+            oracle = OracleQueries(can_write=True)
+            oracle.connect()
+
+            self.listar_doacoes(oracle)
+            id_doacao = self.ler_id("ID da Doação que deseja alterar: ")
+
+            if id_doacao is not None and self.verifica_existencia_doacao(oracle, id_doacao):
+                self.ctrl_doador.listar_doadores(oracle)
+                cpf_informado = input("Digite o CPF do Doador (Novo): ").strip()
+                doador = self.valida_doador(oracle, cpf_informado)
+
+                if doador is not None:
+                    campanha = self.ler_campanha()
+                    valor = self.ler_valor()
+                    data_doacao = self.ler_data()
+
+                    # Aspas simples são duplicadas para não fechar a string SQL
+                    # antes da hora (ex.: "Natal D'Ouro").
+                    campanha_escapada = campanha.replace("'", "''")
+                    oracle.write(f"update doacoes "
+                                 f"set cpf = '{doador.get_cpf()}', "
+                                 f"campanha = '{campanha_escapada}', "
+                                 f"valor = {valor:.2f}, "
+                                 f"data_doacao = to_date('{data_doacao.strftime('%d/%m/%Y')}', 'DD/MM/YYYY') "
+                                 f"where id_doacao = {id_doacao}")
+
+                    ultima_doacao_atualizada = self.get_doacao_from_id(oracle, id_doacao)
+                    print("\nDoação atualizada com sucesso!")
+                    print(ultima_doacao_atualizada.to_string())
+            elif id_doacao is not None:
+                print(f"A doação de ID {id_doacao} não existe.")
+
+            if not self.pergunta_sim_nao("\nDeseja atualizar mais algum registro? (S/N): "):
+                break
+
+        return ultima_doacao_atualizada
+
     def listar_doacoes(self, oracle:OracleQueries, need_connect:bool=False) -> None:
         '''
         Exibe as doações cadastradas com o nome do doador (JOIN com DOADORES),
