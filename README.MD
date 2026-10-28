@@ -82,9 +82,9 @@ erDiagram
 
 3. **Configure as credenciais do banco:**
    
-   Credenciais `src/conexion/passphrase/authentication.oracle` com o usuário e a senha da VM, no formato:
-   ```bash
-  labdatabase,lab@Database2025
+   Crie ou edite o arquivo `src/conexion/passphrase/authentication.oracle` com o usuário e a senha da VM, no formato:
+   ```text
+   labdatabase,lab@Database2025
    ```
    > **Nota:** o arquivo contém `usuario,senha` em uma única linha, sem espaços.
 
