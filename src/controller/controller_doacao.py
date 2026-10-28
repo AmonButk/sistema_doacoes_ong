@@ -30,6 +30,57 @@ class Controller_Doacao:
         # de doadores para listar/validar sem duplicar SQL.
         self.ctrl_doador = Controller_Doador()
 
+    def inserir_doacao(self) -> Doacao:
+        '''
+        Cadastra novas doações até o usuário responder "N".
+        O ID é gerado pela sequence DOACOES_ID_DOACAO_SEQ dentro de um bloco
+        PL/SQL anônimo, que devolve o valor por uma variável de saída (bind).
+        Retorna a última doação inserida, ou None se nenhuma foi gravada.
+
+        Ref.: https://cx-oracle.readthedocs.io/en/latest/user_guide/plsql_execution.html#anonymous-pl-sql-blocks
+        '''
+        ultima_doacao_inserida = None
+
+        while True:
+            oracle = OracleQueries(can_write=True)
+            oracle.connect()
+
+            self.ctrl_doador.listar_doadores(oracle)
+            cpf_informado = input("Digite o CPF do Doador: ").strip()
+            doador = self.valida_doador(oracle, cpf_informado)
+
+            if doador is not None:
+                campanha = self.ler_campanha()
+                valor = self.ler_valor()
+                data_doacao = self.ler_data()
+
+                cursor = oracle.cur
+                id_gerado = cursor.var(int)
+
+                cursor.execute("""
+                begin
+                    :id_doacao := DOACOES_ID_DOACAO_SEQ.NEXTVAL;
+                    insert into doacoes (id_doacao, cpf, campanha, valor, data_doacao)
+                    values (:id_doacao, :cpf, :campanha, :valor, :data_doacao);
+                end;
+                """, dict(id_doacao=id_gerado,
+                          cpf=doador.get_cpf(),
+                          campanha=campanha,
+                          valor=valor,
+                          data_doacao=data_doacao))
+
+                id_doacao = int(id_gerado.getvalue())
+                oracle.conn.commit()
+
+                ultima_doacao_inserida = self.get_doacao_from_id(oracle, id_doacao)
+                print("\nDoação inserida com sucesso!")
+                print(ultima_doacao_inserida.to_string())
+
+            if not self.pergunta_sim_nao("\nDeseja inserir mais algum registro? (S/N): "):
+                break
+
+        return ultima_doacao_inserida
+
     def listar_doacoes(self, oracle:OracleQueries, need_connect:bool=False) -> None:
         '''
         Exibe as doações cadastradas com o nome do doador (JOIN com DOADORES),
