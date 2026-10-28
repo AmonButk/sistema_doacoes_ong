@@ -5,5 +5,5 @@ SELECT d.campanha,
        SUM(d.valor) AS total_arrecadado,
        ROUND(AVG(d.valor), 2) AS media
   FROM doacoes d
- GROUP BY d.campanh
+ GROUP BY d.campanha
  ORDER BY total_arrecadado DESC
