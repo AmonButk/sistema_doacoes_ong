@@ -128,6 +128,36 @@ class Controller_Doacao:
 
         return ultima_doacao_atualizada
 
+    def excluir_doacao(self) -> None:
+        '''
+        Remove doações pelo ID após confirmação, repetindo até o usuário
+        responder "N". Nenhuma tabela referencia DOACOES, então a exclusão
+        não precisa checar dependências de chave estrangeira.
+        '''
+        while True:
+            oracle = OracleQueries(can_write=True)
+            oracle.connect()
+
+            self.listar_doacoes(oracle)
+            id_doacao = self.ler_id("ID da Doação que deseja excluir: ")
+
+            if id_doacao is not None and self.verifica_existencia_doacao(oracle, id_doacao):
+                # Carregada antes do DELETE para ainda podermos exibir o registro removido.
+                doacao_excluida = self.get_doacao_from_id(oracle, id_doacao)
+                print(doacao_excluida.to_string())
+
+                if self.pergunta_sim_nao(f"Confirma a exclusão da doação {id_doacao}? (S/N): "):
+                    oracle.write(f"delete from doacoes where id_doacao = {id_doacao}")
+                    print("\nDoação removida com sucesso!")
+                    print(doacao_excluida.to_string())
+                else:
+                    print("Exclusão cancelada.")
+            elif id_doacao is not None:
+                print(f"A doação de ID {id_doacao} não existe.")
+
+            if not self.pergunta_sim_nao("\nDeseja excluir mais algum registro? (S/N): "):
+                break
+
     def listar_doacoes(self, oracle:OracleQueries, need_connect:bool=False) -> None:
         '''
         Exibe as doações cadastradas com o nome do doador (JOIN com DOADORES),
