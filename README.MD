@@ -1,129 +1,127 @@
-# Exemplo de Sistema em Python fazendo CRUD no Oracle
+# Sistema de Doações para ONG
 
-Esse sistema de exemplo é composto por um conjunto de tabelas que representam pedidos de vendas, contendo tabelas como: clientes, fornecedores, produtos, pedidos e itens de pedido.
+Trabalho C2 da disciplina de **Banco de Dados** — Semestre **2026/2**
 
-O sistema exige que as tabelas existam, então basta executar o script Python a seguir para criação das tabelas e preenchimento de dados de exemplos:
-```shell
-~$ python create_tables_and_records.py
+## 📋 Descrição
+
+Sistema CRUD em **Python 3 + Oracle** para gerenciar doações de uma ONG. O programa permite cadastrar doadores, registrar doações vinculadas a campanhas e gerar relatórios de arrecadação. Desenvolvido como fork do projeto de exemplo [howardroatti/example_crud_oracle](https://github.com/howardroatti/example_crud_oracle).
+
+## 👥 Integrantes
+
+| Nome | Responsabilidade |
+|------|-----------------|
+| Amon | Fork, scripts SQL, dados de exemplo, `principal.py` |
+| Gabriel | Models (`Doador`, `Doacao`) e `controller_doador.py` |
+| Maria Vitória | `controller_doacao.py` |
+| Pedro Paulo | Relatórios, menus (`config.py`) e `splash_screen.py` |
+| Ricardo | Diagrama relacional, README, PROMPTS, vídeo e testes |
+
+## 🗂️ Estrutura do Repositório
+
+```
+diagrams/    DIAGRAMA_RELACIONAL_DOACOES.pdf / .png / .mmd
+sql/         create_tables_doacoes.sql, inserting_samples_records.sql
+src/
+  conexion/oracle_queries.py              (reaproveitado do fork)
+  model/doadores.py, doacoes.py
+  controller/controller_doador.py, controller_doacao.py
+  reports/relatorios.py
+  sql/relatorio_arrecadacao_por_campanha.sql, relatorio_doacoes.sql, relatorio_doadores.sql
+  utils/config.py, splash_screen.py
+  create_tables_and_records.py, principal.py, requirements.txt
+README.MD    PROMPTS.md    LICENSE
 ```
 
-Para executar o sistema basta executar o script Python a seguir:
-```shell
-~$ python principal.py
+## 📊 Diagrama Relacional
+
+O diagrama Mermaid está em [`diagrams/DIAGRAMA_RELACIONAL_DOACOES.mmd`](diagrams/DIAGRAMA_RELACIONAL_DOACOES.mmd) e as versões exportadas em PDF e PNG na mesma pasta.
+
+```mermaid
+erDiagram
+    DOADORES {
+        VARCHAR2_11 CPF PK "NOT NULL"
+        VARCHAR2_100 NOME "NOT NULL"
+        VARCHAR2_100 EMAIL "NULL"
+        VARCHAR2_15 TELEFONE "NULL"
+    }
+
+    DOACOES {
+        NUMBER ID_DOACAO PK "NOT NULL (sequence)"
+        VARCHAR2_11 CPF FK "NOT NULL"
+        VARCHAR2_60 CAMPANHA "NOT NULL"
+        NUMBER_10_2 VALOR "NOT NULL, > 0"
+        DATE DATA_DOACAO "NOT NULL"
+    }
+
+    DOADORES ||--o{ DOACOES : "realiza"
 ```
 
-Para que possa testar as conexões com o banco de dados Oracle e o módulo Conexion desenvolvido para esse projeto, basta executar o script Python a seguir:
-```shell
-~$ python test.py
-```
+**Cardinalidade:** um doador tem 0..N doações, e cada doação pertence a exatamente 1 doador.
 
-## Organização
-- [diagrams](diagrams): Nesse diretório está o [diagrama relacional](diagrams/DIAGRAMA_RELACIONAL_PEDIDOS.pdf) (lógico) do sistema.
-    * O sistema possui cinco entidades: PRODUTOS, CLIENTES, FORNECEDORES, PEDIDOS e ITENS_PEDIDO
-- [sql](sql): Nesse diretório estão os scripts para criação das tabelas e inserção de dados fictícios para testes do sistema
-    * Certifique-se de que o usuário do banco possui todos os privilégios antes de executar os scripts de criação, caso ocorra erro, execute o comando a seguir com o superusuário via SQL Developer: `GRANT ALL PRIVILEGES TO LABDATABASE;`
-    * [create_tables_pedidos.sql](sql/create_tables_pedidos.sql): script responsável pela criação das tabelas, relacionamentos e criação de permissão no esquema LabDatabase.
-    * [inserting_samples_records.sql](sql/inserting_samples_records.sql): script responsável pela inserção dos registros fictícios para testes do sistema.
-    * [inserting_samples_related_records.sql](sql/inserting_samples_related_records.sql): script responsável pela inserção dos registros fictícios de pedidos e itens de pedidos para testes do sistema utilizando blocos PL/SQL.
-- [src](src): Nesse diretório estão os scripts do sistema
-    * [conexion](src/conexion): Nesse repositório encontra-se o [módulo de conexão com o banco de dados Oracle](src/conexion/oracle_queries.py). Esse módulo possui algumas funcionalidades úteis para execução de instruções DML e DDL, sendo possível obter JSON, Matriz e Pandas DataFrame.
-      - Exemplo de utilização para consultas simples:
+## 🚀 Como Rodar (Linux — VM da Disciplina)
 
-        ```python
-        def listar_clientes(self, oracle:OracleQueries, need_connect:bool=False):
-            query = """
-                    select c.cpf
-                        , c.nome 
-                    from clientes c
-                    order by c.nome
-                    """
-            if need_connect:
-                oracle.connect()
-            print(oracle.sqlToDataFrame(query))
-        ```
-      - Exemplo de utilização para alteração de registros
+### Pré-requisitos
 
-        ```python
-        from conexion.oracle_queries import OracleQueries
-        def inserir_cliente(self) -> Cliente:
-            # Cria uma nova conexão com o banco que permite alteração
-            oracle = OracleQueries(can_write=True)
-            oracle.connect()
+- Python 3 instalado
+- Oracle Database acessível (a VM da disciplina já vem configurada)
+- Módulo `cx_Oracle` e `pandas` (listados em `requirements.txt`)
 
-            # Solicita ao usuario o novo CPF
-            cpf = input("CPF (Novo): ")
+### Passo a passo
 
-            if self.verifica_existencia_cliente(oracle, cpf):
-                # Solicita ao usuario o novo nome
-                nome = input("Nome (Novo): ")
-                # Insere e persiste o novo cliente
-                oracle.write(f"insert into clientes values ('{cpf}', '{nome}')")
-                # Recupera os dados do novo cliente criado transformando em um DataFrame
-                df_cliente = oracle.sqlToDataFrame(f"select cpf, nome from clientes where cpf = '{cpf}'")
-                # Cria um novo objeto Cliente
-                novo_cliente = Cliente(df_cliente.cpf.values[0], df_cliente.nome.values[0])
-                # Exibe os atributos do novo cliente
-                print(novo_cliente.to_string())
-                # Retorna o objeto novo_cliente para utilização posterior, caso necessário
-                return novo_cliente
-            else:
-                print(f"O CPF {cpf} já está cadastrado.")
-                return None
-        ```
-      - Outros exemplos: [test.py](src/test.py)
-      - Caso esteja utilizando na máquina virtual antiga, você precisará alterar o método connect de:
-          ```python
-          self.conn = cx_Oracle.connect(user=self.user,
-                                  password=self.passwd,
-                                  dsn=self.connectionString()
-                                  )
-          ```
-        Para:
-          ```python
-          self.conn = cx_Oracle.connect(user=self.user,
-                                  password=self.passwd,
-                                  dsn=self.connectionString(in_container=True)
-                                  )
-          ```
-    * [controller](src/controller/): Nesse diretório encontram-sem as classes controladoras, responsáveis por realizar inserção, alteração e exclusão dos registros das tabelas.
-    * [model](src/model/): Nesse diretório encontram-ser as classes das entidades descritas no [diagrama relacional](diagrams/DIAGRAMA_RELACIONAL_PEDIDOS.pdf)
-    * [reports](src/reports/) Nesse diretório encontra-se a [classe](src/reports/relatorios.py) responsável por gerar todos os relatórios do sistema
-    * [sql](src/sql/): Nesse diretório encontram-se os scripts utilizados para geração dos relatórios a partir da [classe relatorios](src/reports/relatorios.py)
-    * [utils](src/utils/): Nesse diretório encontram-se scripts de [configuração](src/utils/config.py) e automatização da [tela de informações iniciais](src/utils/splash_screen.py)
-    * [create_tables_and_records.py](src/create_tables_and_records.py): Script responsável por criar as tabelas e registros fictícios. Esse script deve ser executado antes do script [principal.py](src/principal.py) para gerar as tabelas, caso não execute os scripts diretamente no SQL Developer ou em alguma outra IDE de acesso ao Banco de Dados.
-    * [principal.py](src/principal.py): Script responsável por ser a interface entre o usuário e os módulos de acesso ao Banco de Dados. Deve ser executado após a criação das tabelas.
+1. **Clone o repositório:**
+   ```bash
+   git clone https://github.com/<usuario>/sistema-doacoes-ong.git
+   cd sistema-doacoes-ong
+   ```
 
-### Bibliotecas Utilizadas
-- [requirements.txt](src/requirements.txt): `pip install -r requirements.txt`
+2. **Instale as dependências:**
+   ```bash
+   cd src
+   pip install -r requirements.txt
+   ```
 
-#### Em caso de problemas com a execução dos software dando a seguinte mensagem `ORA-28001: the password has expired`, execute as linhas de comando a seguir no Oracle:
-- `ALTER PROFILE DEFAULT LIMIT PASSWORD_LIFE_TIME UNLIMITED;`
-- `ALTER USER labdatabase IDENTIFIED BY "labDatabase2022";`
-- `ALTER USER labdatabase IDENTIFIED BY  "labDatabase2022";`
+3. **Configure as credenciais do banco:**
+   
+   Credenciais `src/conexion/passphrase/authentication.oracle` com o usuário e a senha da VM, no formato:
+   ```
+  labdatabase,lab@Database2025
+   ```
+   > **Nota:** o arquivo contém `usuario,senha` em uma única linha, sem espaços.
 
-### Instalando Oracle InstantClient
-- Baixe a versão do [InstantClient](https://www.oracle.com/database/technologies/instant-client/linux-x86-64-downloads.html) de acordo com a versão do Banco de Dados
-- Caso esteja utilizando uma distribuição Linux baseado em Debian, será necessário executar o comando a seguir para converter o arquivo .rpm para .deb.
-  ```shell
-  sudo alien --scripts oracle-instantclient18.5-basic-18.5.0.0.0-3.x86_64.rpm
-  ```
-- Descompacte o arquivo e será gerado um diretório em um diretório de fácil acesso.
-- Mova os diretórios lib e share para dentro do diretório do InstantClient
-  ```shell
-  sudo mv lib /usr/local/oracle/instantclient_18_5/
-  ```
-  
-  ```shell
-  sudo mv share instantclient_18_5/
-  ```
-- Edite o arquivo `.bash_profile` incluindo as linhas a seguir ao final do arquivo:
-  ```shell
-  export ORACLE_HOME=/usr/local/oracle/instantclient_18_5/lib/oracle/18.5/client64
-  export LD_LIBRARY_PATH=$ORACLE_HOME/lib
-  export PATH=$PATH:$ORACLE_HOME/bin
-  export PATH
-  ```
+4. **Crie as tabelas e insira os dados de exemplo:**
+   ```bash
+   python create_tables_and_records.py
+   ```
+   Isso executa os scripts `sql/create_tables_doacoes.sql` e `sql/inserting_samples_records.sql`.
 
-## Contato
-- [LinkedIn](https://linkedin.com/in/howardroatti)
-- [E-Mail](mailto:howardcruzroatti@gmail.com)
+5. **Execute o programa principal:**
+   ```bash
+   python principal.py
+   ```
+
+### Funcionalidades disponíveis no menu
+
+| Opção | Ação |
+|-------|------|
+| 1 | **Relatórios** — Arrecadação por campanha, Doações detalhadas, Lista de doadores |
+| 2 | **Inserir Registros** — Cadastrar doadores e doações |
+| 3 | **Atualizar Registros** — Alterar dados de doadores e doações |
+| 4 | **Remover Registros** — Excluir doadores (com verificação de FK) e doações |
+| 5 | **Sair** |
+
+## 🎥 Vídeo de Demonstração
+
+🔗 **Link do YouTube:** [INSERIR LINK AQUI]
+
+O vídeo demonstra todas as funcionalidades do sistema (5–8 minutos):
+1. Objetivo do sistema e diagrama relacional
+2. Splash screen com contagens de registros
+3. Relatórios (arrecadação por campanha + doações detalhadas)
+4. Inserção de doador e doação
+5. Atualização de registro
+6. Remoção de doação e remoção de doador com doações (verificação de FK)
+7. Splash atualizado e saída
+
+## 📝 Licença
+
+Este projeto foi desenvolvido para fins acadêmicos.
