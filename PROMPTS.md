@@ -5,7 +5,7 @@
 * **Prompt 1 (Análise do Edital):**
   > "Analise este edital e separe as datas de entrega e os itens obrigatórios que o projeto deve conter."
 
-* **Prompt 2 (Definição de Escopo e Tarefas):**
+* **Prompt 2 (Definição de Escopo e Tarefas):*
   > "Com base no PDF do Plano de Implementação C2 de Banco de Dados, estruture e detalhe apenas as etapas e tarefas sob a responsabilidade do Ricardo. Se faltar alguma informação ou houver impedimentos para a execução, indique o que é necessário."
 
 * **Prompt 3 (Melhorias na Documentação):**
