@@ -1,0 +1,17 @@
+erDiagram
+    DOADORES {
+        VARCHAR2_11 CPF PK "NOT NULL"
+        VARCHAR2_100 NOME "NOT NULL"
+        VARCHAR2_100 EMAIL "NULL"
+        VARCHAR2_15 TELEFONE "NULL"
+    }
+
+    DOACOES {
+        NUMBER ID_DOACAO PK "NOT NULL (sequence)"
+        VARCHAR2_11 CPF FK "NOT NULL"
+        VARCHAR2_60 CAMPANHA "NOT NULL"
+        NUMBER_10_2 VALOR "NOT NULL, > 0"
+        DATE DATA_DOACAO "NOT NULL"
+    }
+
+    DOADORES ||--o{ DOACOES : "realiza"
