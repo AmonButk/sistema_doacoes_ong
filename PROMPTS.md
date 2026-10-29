@@ -1,4 +1,4 @@
-# Prompts Utilizados no Projeto de Banco de Dado
+# Prompts Utilizados no Projeto de Banco de Dados
 
 ## Integrante: Ricardo
 
