@@ -47,3 +47,42 @@ Este documento registra todas as interações com ferramentas de Inteligência A
 
 * **Prompt 4 (Testes no Oracle e Fluxo de Commits):**
   > "Quais passos devo seguir para testar os métodos do controller conectando no banco Oracle local e como organizar o envio dessas alterações em commits separados no Git?"
+
+---
+
+## Amon: Prompts de configuração do repositório, scripts SQL, integração e testes na VM
+
+### Prompt A1: Fork, colaboradores e primeiros passos no GitHub
+- **Ferramenta/Fonte:** Claude (Anthropic)
+- **Integrante:** Amon
+- **Prompt utilizado:**
+> "Sou Amon e faço parte de um grupo que está desenvolvendo o trabalho descrito no PDF anexo (Python + Oracle, sem ORM, SQL em string concatenada). Minha parte está na seção 6 (Divisão de tarefas) e o contrato técnico na seção 5.1. Pode me explicar como fazer a parte de hoje, focando no fork e no GitHub?" (depois: "é minha primeira vez usando o GitHub, não sei onde digito esse bash")
+- **O que o grupo fez com a resposta:** Seguimos o passo a passo para fazer o fork, renomear o repositório para `sistema_doacoes_ong`, adicionar o professor `howardroatti` e os 4 colegas como colaboradores, instalar o Git for Windows (Git Bash), clonar o repositório e configurar `user.name` e `user.email` para os commits ficarem vinculados a cada conta.
+
+### Prompt A2: Limpeza dos arquivos do tema antigo (pedidos)
+- **Ferramenta/Fonte:** Claude (Anthropic)
+- **Integrante:** Amon
+- **Prompt utilizado:**
+> "Dei `git ls-files` no repositório após clonar e configurar nome e e-mail" (colando a lista de arquivos) "me instrua exatamente o que mandar no bash para continuar."
+- **O que o grupo fez com a resposta:** Executamos os `git rm` indicados para remover models, controllers, relatórios SQL e demais arquivos do tema "pedidos" do projeto de exemplo, mantendo `oracle_queries.py`, `authentication.oracle`, `requirements.txt` e os `__init__.py`. Em seguida, criamos `sql/create_tables_doacoes.sql` e fizemos commit e push.
+
+### Prompt A3: Scripts de exemplo e resolução de merge
+- **Ferramenta/Fonte:** Claude (Anthropic)
+- **Integrante:** Amon
+- **Prompt utilizado:**
+> "Um outro membro do grupo fez um commit, então imagino que eu tenho que fazer um pull. Me diga o que mandar no bash para a próxima parte" (enviando o PDF do passo a passo de integração), e depois um print do Vim aberto durante o `git pull`: "fechei o bash e abri de novo, como proceder?"
+- **O que o grupo fez com a resposta:** Criamos `sql/inserting_samples_records.sql` (6 doadores e 15 doações em 3 campanhas) e `src/create_tables_and_records.py`, e fizemos um commit por arquivo. Concluímos o merge pendente com `git commit --no-edit`, configuramos `core.editor` para não abrir o Vim novamente e confirmamos no `git log` que tudo estava no GitHub.
+
+### Prompt A4: Análise das pendências do grupo e criação do `principal.py`
+- **Ferramenta/Fonte:** Claude (Anthropic)
+- **Integrante:** Amon
+- **Prompt utilizado:**
+> "Vou mandar um relatório que outro membro do grupo fez sobre o que ainda falta no projeto. Analisando esse relatório, diga se algo que falta irá interferir com alguma parte minha e realize os próximos passos de acordo."
+- **O que o grupo fez com a resposta:** Identificamos que a falta do `src/reports/relatorios.py` impedia o teste do `principal.py`. Conferimos `config.py` e `splash_screen.py` (aceitar argumento em `clear_console`, ordem 3 = Atualizar e 4 = Remover no menu), criamos o `src/principal.py` com menus em laço e `ler_inteiro` para proteger contra entradas inválidas, validamos a sintaxe e fizemos commit e push.
+
+### Prompt A5: Teste na VM (cx_Oracle, venv e login do Oracle)
+- **Ferramenta/Fonte:** Claude (Anthropic)
+- **Integrante:** Amon
+- **Prompt utilizado:**
+> "Abri a máquina virtual pela primeira vez, em tese o código está todo completo. Me mande o que digitar no terminal agora para realizar o teste." (depois, com prints dos erros: `No module named 'cx_Oracle'`, `externally-managed-environment`, `No module named 'pkg_resources'` e `ORA-01017`)
+- **O que o grupo fez com a resposta:** Criamos um ambiente virtual (`venv`) na VM, instalamos o `cx_Oracle` com `--no-build-isolation` e o `pandas` separadamente (sem alterar o `requirements.txt` do repositório) e corrigimos o `authentication.oracle` apenas localmente, sem quebra de linha no final, para resolver o `ORA-01017`. O script `create_tables_and_records.py` passou a executar com `Records successfully generated!`, e então rodamos a bateria de testes do `principal.py` e gravamos o vídeo demonstrativo.
