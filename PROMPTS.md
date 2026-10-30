@@ -86,3 +86,27 @@ Este documento registra todas as interações com ferramentas de Inteligência A
 - **Prompt utilizado:**
 > "Abri a máquina virtual pela primeira vez, em tese o código está todo completo. Me mande o que digitar no terminal agora para realizar o teste." (depois, com prints dos erros: `No module named 'cx_Oracle'`, `externally-managed-environment`, `No module named 'pkg_resources'` e `ORA-01017`)
 - **O que o grupo fez com a resposta:** Criamos um ambiente virtual (`venv`) na VM, instalamos o `cx_Oracle` com `--no-build-isolation` e o `pandas` separadamente (sem alterar o `requirements.txt` do repositório) e corrigimos o `authentication.oracle` apenas localmente, sem quebra de linha no final, para resolver o `ORA-01017`. O script `create_tables_and_records.py` passou a executar com `Records successfully generated!`, e então rodamos a bateria de testes do `principal.py` e gravamos o vídeo demonstrativo.
+
+---
+
+### Integrante Gabriel:
+* **Prompt 1 (Plano de Implementação e Divisão do Grupo):**
+  > "Eu e meu grupo temos um trabalho de banco de dados para entregar. Analise cuidadosamente o edital 'C2 edital desenvolvimento' e monte um plano de implementação para o grupo, seguindo o edital e escolhendo um tema de menor complexidade. Os membros são: Amon, Gabriel, Maria Vitória, Pedro Paulo e Ricardo."
+  * **Uso:** revisei e levei ao grupo, que validou o tema, a divisão de tarefas e o contrato técnico de nomes de tabelas, classes e métodos.
+  
+* **Prompt 2 (Classes Model e Controller_Doador):**
+  > "Com base no arquivo 'plano de implementação' que está localizado nos meus downloads, quero que você faça as tarefas destinadas ao membro Gabriel Ridolfi, explique o que foi feito em cada uma para eu implementar."
+  * **Uso:** a IA gerou `doadores.py`, `doacoes.py` e `controller_doador.py` seguindo o contrato técnico e o padrão do projeto do professor. Estudei a explicação de cada método, em especial a verificação de FK antes de excluir o doador.
+
+* **Prompt 3 (Ambiente local para testes):**
+  > "Pode baixar o Python e o Oracle e abra o código gerado para eu  poder conferir."
+  * **Uso:** instalei o Python e o Oracle XE no meu computador e testei o controller contra o banco: inserção, CPF repetido, atualização, exclusão simples e exclusão com doações (respondendo N e depois S). Tudo funcionou.
+
+* **Prompt 4 (Guia da Reunião de Integração):** *(resumo — feito em outra máquina, texto original não preservado)*
+  > Pedi um passo a passo para a reunião de integração, com a ordem dos commits de cada integrante, checklists de conferência do código e a bateria de testes.
+  * **Uso:** conduzi a reunião com o guia.
+
+* **Prompt 5 (Revisão cruzada dos arquivos do grupo):**
+  > "Analise a pasta 'revisar codigo' e, com base nas regras do PDF 'passo a passo reuniao', veja se as classes estão conversando entre si ou se há algum erro. Não precisa testar ainda, só cheque nomes de classes, métodos, variáveis, tudo que possa interromper a comunicação em um teste futuro."
+  * **Uso:** a revisão confirmou que o código dos colegas estava de acordo com o contrato. Também apontou ajustes menores, como a leitura de CPF com pontuação no `controller_doacao.py`.
+---
