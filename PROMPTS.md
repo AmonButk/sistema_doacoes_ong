@@ -1,4 +1,22 @@
-# Prompts Utilizados no Projeto de Banco de Dados
+# Registro de Uso de Inteligência Artificial (PROMPTS.md)
+
+Este documento registra todas as interações com ferramentas de Inteligência Artificial realizadas durante o desenvolvimento do projeto, em conformidade com as exigências do edital.
+
+---
+
+* **Integrante:** Pedro Paulo
+
+* **Prompt 1 (Análise do edital)**
+  > "Estou com esse plano de implementação para um trabalho academico e preciso fazer a minha parte para conclusão do projeto. Analise esse arquivo e me diga o que exatamente posso adiantar para concluir minha etapa do preojeto (Minha parte consta no arquivo com o nome de 'Pedro Paulo', item E))."
+* **O que foi feito com a resposta:**
+  Identificação dos 6 arquivos de responsabilidade de Pedro Paulo (`src/sql/relatorio_arrecadacao_por_campanha.sql`, `src/sql/relatorio_doacoes.sql`, `src/sql/relatorio_doadores.sql`, `src/reports/relatorios.py`, `src/utils/config.py` e `src/utils/splash_screen.py`) e entendimento de que sua etapa pode ser realizada de forma independente dos outros módulos.
+
+* **Prompt 2 (Construção do projeto)**
+  > "Ok! Agr quero que você construa a minha parte do trabalho seguindo exatamente o plano proposto, passo a passo! Caso encontre alguma divergencia ou tenha alguma dúvida, me informe que ditarei o caminho a ser seguido. Faça tudo desde o começo. Crie as pastas com os nomes exatos, arquivos e afins..."
+* **O que foi feito com a resposta:**
+  Geração e criação dos arquivos da Seção 5.1-E do contrato técnico, com implementação das consultas SQL obrigatórias (sumarização e junção), classe `Relatorio` com exibição via DataFrame, menus padronizados em `config.py` e tela de abertura com contagens dinâmicas no banco em `splash_screen.py`.
+
+
 
 ## Integrante: Ricardo
 
