@@ -111,7 +111,7 @@ erDiagram
 
 ## 🎥 Vídeo de Demonstração
 
-🔗 **Link do YouTube:** [INSERIR LINK AQUI]
+🔗 **Link do YouTube:** [https://youtu.be/y5SLDczoaH4]
 
 O vídeo demonstra todas as funcionalidades do sistema (5–8 minutos):
 1. Objetivo do sistema e diagrama relacional
