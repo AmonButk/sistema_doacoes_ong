@@ -4,7 +4,7 @@ Este documento registra todas as interações com ferramentas de Inteligência A
 
 ---
 
-* **Integrante:** Pedro Paulo
+## Integrante: Pedro Paulo
 
 * **Prompt 1 (Análise do edital)**
   > "Estou com esse plano de implementação para um trabalho academico e preciso fazer a minha parte para conclusão do projeto. Analise esse arquivo e me diga o que exatamente posso adiantar para concluir minha etapa do preojeto (Minha parte consta no arquivo com o nome de 'Pedro Paulo', item E))."
